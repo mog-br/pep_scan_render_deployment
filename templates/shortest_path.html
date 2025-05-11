@@ -406,6 +406,10 @@
     </script>
 
     <script>
+        const graphData = {{ graph_data | safe }};
+    </script>
+
+    <script>
         // ===== DATA PRESERVATION =====
         // Save form data when user starts typing
         const form = document.querySelector('form');
