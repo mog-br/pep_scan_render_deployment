@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PEPs que Receberam Auxílio do Governo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1300px; /* Aumentei um pouco o max-width para acomodar melhor os gráficos */
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            background-color: #002147;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav {
+            background-color: #004080;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a.active {
+        background-color: #002147;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid white;
+        }
+        .page-context {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        }
+        .context-description {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .charts-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .chart {
+            width: 48%; /* Cada gráfico vai ocupar aproximadamente metade da largura da página */
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .chart img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        form label {
+            font-weight: bold;
+        }
+        form select {
+            margin: 10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        form button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .btn {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display:   
+            inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        /* Primary button (main actions) */
+        .btn-primary {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #002147;
+        }
+        
+        /* Secondary button (alternative actions) */
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Danger button (destructive actions) */
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* Button with icon */
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PEPs que Receberam Auxílio do Governo</h1>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('peps_distribution') }}" class="{% if request.endpoint == 'peps_distribution' %}active{% endif %}">Distribuição de PEPs</a>
+        <a href="{{ url_for('descriptive_analysis') }}" class="{% if request.endpoint == 'descriptive_analysis' %}active{% endif %}">Auxílios do Governo</a>
+        <a href="{{ url_for('shortest_path') }}" class="{% if request.endpoint == 'shortest_path' %}active{% endif %}">Caminho Mais Curto</a>
+        <a href="{{ url_for('user_input_analysis') }}" class="{% if request.endpoint == 'user_input_analysis' %}active{% endif %}">Relacionamentos</a>
+        <a href="{{ url_for('contacts') }}" class="{% if request.endpoint == 'contacts' %}active{% endif %}">Contato</a>
+    </nav>
+    
+    <div class="container">
+        <div class="page-context">
+            <h1>{{ self._TemplateReference__context.title }}</h1>
+            <p class="context-description">
+                {% if request.endpoint == 'home' %}
+                    Ferramenta de análise de PEPs brasileiros
+                {% elif request.endpoint == 'peps_distribution' %}
+                    Distribuição geográfica e por categoria de PEPs
+                {% elif request.endpoint == 'descriptive_analysis' %}
+                    Análise de beneficiários de auxílios governamentais
+                {% endif %}
+                <!-- Add descriptions for other pages as needed -->
+            </p>
+        </div>
+
+        <h2>O que são auxílios do governo brasileiro?</h2>
+        <p>Os auxílios do governo brasileiro são programas sociais criados com o objetivo de oferecer suporte financeiro a pessoas e famílias em situações de vulnerabilidade social e econômica. Esses benefícios têm o propósito de garantir uma rede de proteção, especialmente em momentos de crise, e de promover a redução da desigualdade no país.</p>
+        
+        <p>No contexto do PEP Scan, estão sendo considerados dados de benificiários do Bolsa Família e Auxílio Emergencial.</p>
+
+        
+            <h3>Auxílio Emergencial</h3>
+            <p>O Auxílio Emergencial foi um programa criado pelo governo federal em 2020, como uma medida de enfrentamento aos impactos econômicos causados pela pandemia de COVID-19. O benefício teve como objetivo principal fornecer uma assistência financeira temporária para trabalhadores informais, microempreendedores individuais (MEIs), desempregados, e pessoas de baixa renda que estavam enfrentando dificuldades financeiras devido ao isolamento social e à crise sanitária.</p>
+            <p>O valor do Auxílio Emergencial variava conforme a situação do beneficiário e as políticas implementadas ao longo do programa. Inicialmente, os valores eram de R$ 600 para pessoas solteiras e R$ 1.200 para mães chefes de família, mas ao longo dos meses houve ajustes nos valores e na forma de pagamento. O programa foi encerrado em 2021, mas teve uma grande relevância para milhões de brasileiros que estavam em situação de vulnerabilidade e sem acesso a outras fontes de renda durante a pandemia.</p>
+
+            <h3>Bolsa Família</h3>
+            <p>O Bolsa Família é um programa de transferência direta de renda criado em 2003, com o objetivo de combater a pobreza e a fome no Brasil. Diferentemente do Auxílio Emergencial, que foi uma medida emergencial para uma crise específica, o Bolsa Família é um programa contínuo e regular, destinado a famílias em situação de extrema pobreza e pobreza.</p>
+            <p>Para ter acesso ao benefício, as famílias precisam atender a critérios específicos, como ter uma renda per capita inferior a R$ 218 (para a extrema pobreza) ou entre R$ 218 e R$ 436 (para a pobreza), além de atender a condições de saúde e educação, como garantir a frequência escolar de crianças e adolescentes e a realização de exames e vacinas. O valor do benefício varia de acordo com a situação de cada família e pode ser complementado por outros benefícios, como o Benefício Variável, destinado a crianças e adolescentes de até 17 anos.</p>
+
+
+        <h2>Análise de PEPs que receberam Auxílio Emergencial</h2>
+        <p>Os PEPs (Pessoas Expostas Politicamente) que receberam o Auxílio Emergencial, um benefício oferecido pelo governo brasileiro durante a pandemia de COVID-19, são destacados a seguir. A visualização mostra a distribuição desses indivíduos:</p>
+        
+        <div class="chart-center">
+            <div class="chart">
+                <h3>Distribuição de PEPs que Receberam Auxílio Emergencial</h3>
+                <img src="{{ url_for('static', filename='images/distribution_pep_aux_emer.png') }}" alt="Distribuição de PEPs que Receberam Auxílio Emergencial">
+            </div>
+            <div class="chart">
+                <h3>Distribuição de PEPs que Receberam Auxílio Emergencial por Estado</h3>
+                <img src="{{ url_for('static', filename='images/pep_aux_emer_per_state.png') }}" alt="Distribuição de PEPs que Receberam Auxílio Emergencial por Estado">
+            </div>
+        </div>
+        
+        <style>
+            .chart-center {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+        
+            .chart {
+                text-align: center;
+                width: 50%;
+            }
+        </style>
+        
+        <p>A seguir você pode indentificar tais PEPs:</p>
+
+        <!-- Table with PEPs data -->
+        <div class="search-results">
+            <table id="pep-aux-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Sigla da Função</th>
+                        <th>UF</th>
+                        <th>DT do Início do Exercício</th>
+                        <th>DT do Fim do Exercício</th>
+                        <th>Qtd de Meses Recebidos</th>
+                        <th>Primeiro Mês Recebido</th>
+                        <th>Último Mês Recebido</th>
+                    </tr>
+                </thead>
+                <tbody id="pep-aux-emer-table-body">
+                    <!-- Table body initially filled with the first 10 rows of PEPs -->
+                    {% for pep in peps_aux %}
+                    <tr>
+                        <td>{{ pep[0] }}</td>
+                        <td>{{ pep[1] }}</td>
+                        <td>{{ pep[2] }}</td>
+                        <td>{{ pep[3] }}</td>
+                        <td>{{ pep[4] }}</td>
+                        <td>{{ pep[5] }}</td>
+                        <td>{{ pep[6] }}</td>
+                        <td>{{ pep[7] }}</td>
+                        <td>{{ pep[8] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+            <!-- Pagination links -->
+            <div id="pagination_aux" class="pagination">
+                {% if page > 1 %}
+                    <a href="#" class="pagination-aux-link" data-page="{{ page - 1 }}">&#60; Anterior</a>
+                {% endif %}
+
+                {% if has_next_aux %}
+                    <a href="#" class="pagination-aux-link button" data-page="{{ page + 1 }}">Próximo &#62;</a>
+                {% else %}
+                    <span class="pagination-aux-link button" style="pointer-events: none; color: #ccc;">Próximo &#62;</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <style>
+            .pagination {
+                text-align: right;
+                margin-top: 20px;
+            }
+            
+            .pagination a {
+                text-decoration: none;
+                padding: 8px 16px;
+                border: 1px solid #ccc;
+                color: #333;
+                background-color: #f9f9f9;
+                border-radius: 5px;
+                margin: 0 2px;
+            }
+            
+            .pagination a:hover {
+                background-color: #ddd;
+            }
+        
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+        
+            table, th, td {
+                border: 1px solid #ccc;
+            }
+        
+            th, td {
+                padding: 10px;
+                text-align: left;
+            }
+        
+            th {
+                background-color: #f2f2f2;
+            }
+        
+            tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+        </style>
+        
+        <!-- Adding jQuery and AJAX script to handle pagination -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).on('click', '.pagination-aux-link', function(event) {
+                event.preventDefault();
+                var page = $(this).data('page');  // Get the page number
+        
+                // Send an AJAX request to the server to get the next set of data
+                $.ajax({
+                    url: '/paginate-data-aux',  // Flask route to handle pagination
+                    method: 'GET',
+                    data: { page: page },
+                    success: function(response) {
+                        // Replace the table body and pagination with the new data
+                        $('#pep-aux-emer-table-body').html(response.table);
+                        $('#pagination_aux').html(response.pagination);
+                    },
+                    error: function(error) {
+                        console.error("Error fetching data: ", error);
+                    }
+                });
+            });
+        </script>
+        
+        <div class="download-container">
+            <p>Você pode baixar a lista completa de PEPs que receberam Auxílio Emergencial em formato CSV:</p>
+            <a href="{{ url_for('download_peps_aux_emer') }}" class="btn-primary btn-icon">Download CSV</a>
+        </div>
+        
+        <style>
+            .download-container {
+                display: flex;
+                align-items: center;
+                margin-top: 20px;
+            }
+        
+            .download-container p {
+                margin-right: 10px;
+                margin-bottom: 15px;
+            }
+        
+            .button {
+                display: inline-block;
+                padding: 10px 15px;
+                background-color: #007BFF;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                margin: 0;
+            }
+        
+            .button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+
+
+        <h2>Análise de PEPs que receberam Bolsa Família</h2>
+        <p>Os PEPs (Pessoas Expostas Politicamente) que receberam Bolsa Família, um benefício oferecido pelo governo brasileiro para famílias menos favorecidas financeiramente. A visualização mostra a distribuição desses indivíduos:</p>
+
+        <div class="chart-center">
+            <div class="chart">
+                <h3>Distribuição de PEPs que Receberam Bolsa Família</h3>
+                <img src="{{ url_for('static', filename='images/distribution_pep_bolsa_fam.png') }}" alt="Distribuição de PEPs que Receberam Bolsa Família">
+            </div>
+            <div class="chart">
+                <h3>Distribuição de PEPs que Receberam Bolsa Família por Estado</h3>
+                <img src="{{ url_for('static', filename='images/pep_bolsa_fam_per_state.png') }}" alt="Distribuição de PEPs que Receberam Bolsa Família por Estado">
+            </div>
+        </div>
+
+        <p>A seguir você pode indentificar tais PEPs:</p>
+
+        <!-- Table with PEPs data -->
+        <div class="search-results">
+            <table id="pep-bf-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Sigla da Função</th>
+                        <th>UF</th>
+                        <th>DT do Início do Exercício</th>
+                        <th>DT do Fim do Exercício</th>
+                        <th>Qtd de Meses Recebidos</th>
+                        <th>Primeiro Mês Recebido</th>
+                        <th>Último Mês Recebido</th>
+                    </tr>
+                </thead>
+                <tbody id="pep-bf-table-body">
+                    <!-- Table body initially filled with the first 10 rows of PEPs -->
+                    {% for pep in peps_bf %}
+                    <tr>
+                        <td>{{ pep[0] }}</td>
+                        <td>{{ pep[1] }}</td>
+                        <td>{{ pep[2] }}</td>
+                        <td>{{ pep[3] }}</td>
+                        <td>{{ pep[4] }}</td>
+                        <td>{{ pep[5] }}</td>
+                        <td>{{ pep[6] }}</td>
+                        <td>{{ pep[7] }}</td>
+                        <td>{{ pep[8] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+            <!-- Pagination links -->
+            <div id="pagination_bolsa" class="pagination">
+                {% if page > 1 %}
+                    <a href="#" class="pagination-bolsa-link" data-page="{{ page - 1 }}">&#60; Anterior</a>
+                {% endif %}
+
+                {% if has_next_bf %}
+                    <a href="#" class="pagination-bolsa-link button" data-page="{{ page + 1 }}">Próximo &#62;</a>
+                {% else %}
+                    <span class="pagination-bolsa-link button" style="pointer-events: none; color: #ccc;">Próximo &#62;</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <style>
+            .pagination {
+                text-align: right;
+                margin-top: 20px;
+            }
+            
+            .pagination a {
+                text-decoration: none;
+                padding: 8px 16px;
+                border: 1px solid #ccc;
+                color: #333;
+                background-color: #f9f9f9;
+                border-radius: 5px;
+                margin: 0 2px;
+            }
+            
+            .pagination a:hover {
+                background-color: #ddd;
+            }
+        
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+        
+            table, th, td {
+                border: 1px solid #ccc;
+            }
+        
+            th, td {
+                padding: 10px;
+                text-align: left;
+            }
+        
+            th {
+                background-color: #f2f2f2;
+            }
+        
+            tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+        </style>
+        
+        <!-- Adding jQuery and AJAX script to handle pagination -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).on('click', '.pagination-bolsa-link', function(event) {
+                event.preventDefault();
+                var page = $(this).data('page');  // Get the page number
+        
+                // Send an AJAX request to the server to get the next set of data
+                $.ajax({
+                    url: '/paginate-data-bf',  // Flask route to handle pagination
+                    method: 'GET',
+                    data: { page: page },
+                    success: function(response) {
+                        // Replace the table body and pagination with the new data
+                        $('#pep-bf-table-body').html(response.table);
+                        $('#pagination_bolsa').html(response.pagination);
+                    },
+                    error: function(error) {
+                        console.error("Error fetching data: ", error);
+                    }
+                });
+            });
+        </script>
+
+
+        <div class="download-container">
+            <p>Você pode baixar a lista completa de PEPs que receberam Bolsa Família em formato CSV:</p>
+            <a href="{{ url_for('download_peps_bf') }}" class="btn-primary btn-icon">Download CSV</a>
+        </div>
+
+        <style>
+            .download-container {
+                display: flex;
+                align-items: center;
+                margin-top: 20px;
+            }
+
+            .download-container p {
+                margin-right: 10px;
+                margin-bottom: 15px;
+            }
+
+            .button {
+                display: inline-block;
+                padding: 10px 15px;
+                background-color: #007BFF;
+                color: white;
+                text-decoration: none;
+                border-radius: 5px;
+                margin: 0;
+            }
+
+            .button:hover {
+                background-color: #0056b3;
+            }
+        </style>
+
+    </div>
+</body>
+</html>

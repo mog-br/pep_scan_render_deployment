@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Grafos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #002147;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        nav {
+            background: #004080;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a.active {
+        background-color: #002147;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid white;
+        }
+        .page-context {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        }
+        .context-description {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        .container {
+            padding: 20px;
+        }
+        form {
+            text-align: left;
+            margin-top: 20px;
+            max-width: 10000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+        .input-group.label-spacer {
+            margin-bottom: 60px;
+        }
+        .input-group label {
+            font-weight: bold;
+            width: 250px;
+            white-space: nowrap;
+        }
+        form input[type=text], form input[type=number] {
+            padding: 5px;
+            width: 500px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        form button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .graph-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* Added for legend positioning */
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        /* Legend styling */
+        .legend {
+            position: absolute; /* Positioned relative to graph-container */
+            top: 10px; /* Adjust as needed */
+            right: 10px; /* Adjust as needed */
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            z-index: 1000; /* Ensure it stays on top */
+            display: none; /* Hidden by default */
+        }
+
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .legend .color-box {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 auto 30px;
+            max-width: 800px;
+            counter-reset: step;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #ccc;
+            z-index: 0;
+        }
+
+        .step span {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            background: #ccc;
+            color: white;
+            display: inline-block;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step.active span {
+            background: #004080;
+        }
+
+        .step.completed span {
+            background: #4CAF50;
+        }
+
+        .step p {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .step.active p,
+        .step.completed p {
+            color: #004080;
+            font-weight: bold;
+        }
+
+        input[data-autofilled] {
+            background-color: #f0f8ff !important;
+            border-left: 3px solid #004080;
+            padding-left: 8px;
+        }
+            /* Primary button (main actions) */
+        .btn-primary {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #002147;
+        }
+        
+        /* Secondary button (alternative actions) */
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Danger button (destructive actions) */
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* Button with icon */
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Explorando conexões de pessoas e empresas</h1>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('peps_distribution') }}" class="{% if request.endpoint == 'peps_distribution' %}active{% endif %}">Distribuição de PEPs</a>
+        <a href="{{ url_for('descriptive_analysis') }}" class="{% if request.endpoint == 'descriptive_analysis' %}active{% endif %}">Auxílios do Governo</a>
+        <a href="{{ url_for('shortest_path') }}" class="{% if request.endpoint == 'shortest_path' %}active{% endif %}">Caminho Mais Curto</a>
+        <a href="{{ url_for('user_input_analysis') }}" class="{% if request.endpoint == 'user_input_analysis' %}active{% endif %}">Relacionamentos</a>
+        <a href="{{ url_for('contacts') }}" class="{% if request.endpoint == 'contacts' %}active{% endif %}">Contato</a>
+    </nav>
+    
+    <div class="container">
+
+        <div class="progress-steps">
+            <div class="step" id="step1">
+                <span>1</span>
+                <p>Inserir dados</p>
+            </div>
+            <div class="step" id="step2">
+                <span>2</span>
+                <p>Processar análise & Visualizar resultados</p>
+            </div>
+        </div>
+
+
+        <h2>Análise de Grafos</h2>
+        <p>Use a caixa de entrada abaixo para investigar conexões começando por uma pessoa ou empresa de sua escolha.<br/>
+            Durante a visualização das conexões, ao clicar no ícone de uma pessoa ou empresa, a visualização será expandida para mostrar as conexões relacionadas a pessoa ou empresa clicada.</p>
+
+        {% if error_message %}
+            <div class="error-message">{{ error_message }}</div>
+        {% endif %}
+
+        <form method="POST" action="/user_input_analysis?submitted=true">
+            <div class="input-group">
+                <label for="start_node_name">Nome:</label>
+                <input type="text" id="start_node_name" name="start_node_name" placeholder="Insira o nome da pessoa/empresa" required>
+                <div class="checkboxes">
+                    <label>
+                        <input type="checkbox" name="is_pf_node" value="PF_node"> PF
+                    </label>
+                    <label>
+                        <input type="checkbox" name="is_pj_node" value="PJ_node"> PJ
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group label-spacer">
+                <label for="cpf_node">CPF/CNPJ:</label>
+                <input type="text" name="cpf_node" id="cpf_node" placeholder="Insira o CPF/CNPJ" required>
+                <div class="checkboxes">
+                    <label>
+                        <input type="checkbox" name="is_cpf_complete_node" value="complete_node"> CPF/CNPJ Completo
+                    </label>
+                    <label>
+                        <input type="checkbox" name="is_cpf_partial_node" value="partial_node"> CPF/CNPJ Parcial
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary btn-icon" name="action" value="caminho_grafo">Buscar Relações</button>
+        </form>
+
+        <form id="clear-graph-form">
+            <button type="button" class="btn-primary btn-icon" name="action" value="clear_everything" onclick="clearGraph()">Reiniciar Busca</button>
+        </form>
+
+        <div class="graph-container">
+            <div id="graph-container">
+                {{ graph_html|safe }}
+            </div>
+            <!-- Graph Legend -->
+            <div class="legend" id="graph-legend">
+                <div>
+                    <div class="color-box" style="background-color: #FFA500;"></div>
+                    <span>Última pessoa/empresa selecionada</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: #0000FF;"></div>
+                    <span>Pessoa/empresa ainda não clicadas</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: #006400;"></div>
+                    <span>Pessoa/empresa selecionada atualmente</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: #90EE90;"></div>
+                    <span>Relacionamento direto</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: #E3464C;"></div>
+                    <span>Benefício governamental</span>
+                </div>
+                <div>
+                    <div class="color-box" style="background-color: #DD6629;"></div>
+                    <span>Autoridade pública (PEP)</span>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function clearGraph() {
+            // Perform an AJAX request to clear the graph
+
+            const confirmed = window.confirm("Tem certeza de que deseja limpar o grafo? Esta ação não pode ser desfeita.");
+
+            if (!confirmed) {
+                return; // Abort if the user cancels
+            }
+
+            fetch("/clear_graph", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "clear_everything" })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    // Clear the graph container
+                    const graphContainer = document.getElementById("graph-container");
+                    graphContainer.innerHTML = ""; // This clears the graph display
+                    document.getElementById("graph-legend").style.display = "none"; // Hide the legend
+                    
+                    // Reset progress steps to initial state
+                    document.getElementById('step1').classList.remove('completed');
+                    document.getElementById('step2').classList.remove('active', 'completed');
+                    document.getElementById('step1').classList.add('active');
+                    
+                    alert("Grafo limpo com sucesso!");
+                } else {
+                    alert(data.message || "Erro ao limpar o grafo.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao limpar o grafo:", error);
+                alert("Erro ao limpar o grafo. Tente novamente.");
+            });
+        }       
+
+        // Show the legend if the graph is displayed
+        const graphContainer = document.getElementById("graph-container");
+        const legend = document.getElementById("graph-legend");
+        if (graphContainer.innerHTML.trim() !== "") {
+            legend.style.display = "block";
+        }
+    </script>
+
+    <script>
+        // Initialize - set first step as active
+        document.getElementById('step1').classList.add('active');
+        
+        // When form is submitted
+        document.querySelector('form').addEventListener('submit', function() {
+            // Show loading state
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+            
+            // If you're using AJAX to load results:
+            // This would go in your AJAX success callback
+            function showResults() {
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('step3').classList.add('active');
+            }
+            
+            // For non-AJAX forms (page reload):
+            // We'll need to check URL parameters or use sessionStorage
+            if (window.location.search.includes('submitted=true')) {
+                showResults();
+            }
+        });
+        
+        // Check if we're returning to the page after submission
+        if (window.location.search.includes('submitted=true')) {
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('completed');
+        }
+    </script>
+
+    <script>
+        // ===== DATA PRESERVATION =====
+        // Save form data when user starts typing
+        const form = document.querySelector('form');
+        const formData = {};
+        
+        // Initialize form data from localStorage if available
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem('unsavedFormData_' + window.location.pathname);
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                Object.keys(data).forEach(key => {
+                    const element = form.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        element.value = data[key];
+                        // For checkboxes
+                        if (element.type === 'checkbox') {
+                            element.checked = data[key];
+                        }
+                    }
+                });
+                
+                if (confirm('Encontramos dados não enviados de sua última sessão nesta página. Deseja restaurá-los?')) {
+                    Object.assign(formData, data);
+                } else {
+                    localStorage.removeItem('unsavedFormData_' + window.location.pathname);
+                }
+            }
+        });
+
+        // Save data on input
+        form.querySelectorAll('input, select, textarea').forEach(element => {
+            element.addEventListener('input', () => {
+                formData[element.name] = element.type === 'checkbox' ? element.checked : element.value;
+                localStorage.setItem('unsavedFormData_' + window.location.pathname, JSON.stringify(formData));
+            });
+        });
+
+        // Clear saved data on successful form submission
+        form.addEventListener('submit', () => {
+            localStorage.removeItem('unsavedFormData_' + window.location.pathname);
+        });
+        // ===== END DATA PRESERVATION =====
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caminho Mais Curto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #002147;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+        nav {
+            background: #004080;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a.active {
+        background-color: #002147;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid white;
+        }
+        .page-context {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        }
+        .context-description {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        .container {
+            padding: 20px;
+        }
+        form {
+            text-align: left;
+            margin-top: 20px;
+            max-width: 10000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+        .input-group.label-spacer {
+            margin-bottom: 60px;
+        }
+        .input-group label {
+            font-weight: bold;
+            width: 250px;
+            white-space: nowrap;
+        }
+        form input[type=text], form input[type=number] {
+            padding: 5px;
+            width: 500px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .checkboxes {
+            display: flex;
+            gap: 0px;
+        }
+        form button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .graph-container {
+            margin-top: 30px;
+            text-align: center;
+            width: 100%;
+            height: 500px;
+        }
+        #network {
+            width: 100%;
+            height: 100%;
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 auto 30px;
+            max-width: 800px;
+            counter-reset: step;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+
+        .step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #ccc;
+            z-index: 0;
+        }
+
+        .step span {
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            background: #ccc;
+            color: white;
+            display: inline-block;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step.active span {
+            background: #004080;
+        }
+
+        .step.completed span {
+            background: #4CAF50;
+        }
+
+        .step p {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .step.active p,
+        .step.completed p {
+            color: #004080;
+            font-weight: bold;
+        }
+
+        /* Primary button (main actions) */
+        .btn-primary {
+            background-color: #004080;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #002147;
+        }
+        
+        /* Secondary button (alternative actions) */
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Danger button (destructive actions) */
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* Button with icon */
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+    <!-- Include vis.js library -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@9.0.4/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Caminho mais curto entre duas pessoas ou empresas</h1>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('peps_distribution') }}" class="{% if request.endpoint == 'peps_distribution' %}active{% endif %}">Distribuição de PEPs</a>
+        <a href="{{ url_for('descriptive_analysis') }}" class="{% if request.endpoint == 'descriptive_analysis' %}active{% endif %}">Auxílios do Governo</a>
+        <a href="{{ url_for('shortest_path') }}" class="{% if request.endpoint == 'shortest_path' %}active{% endif %}">Caminho Mais Curto</a>
+        <a href="{{ url_for('user_input_analysis') }}" class="{% if request.endpoint == 'user_input_analysis' %}active{% endif %}">Relacionamentos</a>
+        <a href="{{ url_for('contacts') }}" class="{% if request.endpoint == 'contacts' %}active{% endif %}">Contato</a>
+    </nav>
+    
+    <div class="container">
+
+        <div class="progress-steps">
+            <div class="step" id="step1">
+                <span>1</span>
+                <p>Inserir dados</p>
+            </div>
+            <div class="step" id="step2">
+                <span>2</span>
+                <p>Processar análise & Visualizar resultados</p>
+            </div>
+        </div>
+
+        <div class="page-context">
+            <h1>{{ self._TemplateReference__context.title }}</h1>
+            <p class="context-description">
+                {% if request.endpoint == 'home' %}
+                    Ferramenta de análise de PEPs brasileiros
+                {% elif request.endpoint == 'peps_distribution' %}
+                    Distribuição geográfica e por categoria de PEPs
+                {% elif request.endpoint == 'descriptive_analysis' %}
+                    Análise de beneficiários de auxílios governamentais
+                {% endif %}
+                <!-- Add descriptions for other pages as needed -->
+            </p>
+        </div>
+
+        <h2 style="margin-top: 40px;">Encontro do Caminho Mais Curto</h2>
+        <p>A presente análise encontra o caminho mais curto entre duas pessoas e/ou empresas inseridas nas caixas de entrada abaixo.</p>
+
+        <form method="POST" action="/shortest_path?submitted=true">
+            <div class="input-group">
+                <label for="name3">Nome da Primeira Entidade:</label>
+                <input type="text" name="name3" id="name3" placeholder="Insira o nome da pessoa/empresa" required>
+                <div class="checkboxes">
+                    <label>
+                        <input type="checkbox" name="is_pf3" value="PF"> PF
+                    </label>
+                    <label>
+                        <input type="checkbox" name="is_pj3" value="PJ"> PJ
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group label-spacer">
+                <label for="cpf3">CPF/CNPJ:</label>
+                <input type="text" name="cpf3" id="cpf3" placeholder="Insira o CPF/CNPJ" required>
+                <div class="checkboxes">
+                    <label>
+                        <input type="checkbox" name="is_cpf_complete3" value="complete"> CPF/CNPJ Completo
+                    </label>
+                    <label>
+                        <input type="checkbox" name="is_cpf_partial3" value="partial"> CPF/CNPJ Parcial
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="name4">Nome da Segunda Entidade:</label>
+                <input type="text" name="name4" id="name4" placeholder="Insira o nome da pessoa/empresa" required>
+                <div class="checkboxes">
+                    <label>
+                        <input type="checkbox" name="is_pf4" value="PF"> PF
+                    </label>
+                    <label>
+                        <input type="checkbox" name="is_pj4" value="PJ"> PJ
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group label-spacer">
+                <label for="cpf4">CPF/CNPJ:</label>
+                <input type="text" name="cpf4" id="cpf4" placeholder="Insira o CPF/CNPJ" required>
+                <div class="checkboxes">
+                    <label>
+                        <input type="checkbox" name="is_cpf_complete4" value="complete"> CPF/CNPJ Completo
+                    </label>
+                    <label>
+                        <input type="checkbox" name="is_cpf_partial4" value="partial"> CPF/CNPJ Parcial
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary btn-icon" name="action" value="caminho">Encontrar Caminho</button>
+        </form>
+
+        {% if result_caminho %}
+            <div class="result">
+                <h2>Resultado do Caminho Mais Curto</h2>
+                {{ result_caminho|safe }}
+            </div>
+        {% endif %}
+
+        {% if graph_data %}
+            <div class="graph-container">
+                <div id="network"></div>
+                <script type="text/javascript">
+                    var nodes = new vis.DataSet({{ graph_data.nodes|tojson }});
+                    var edges = new vis.DataSet({{ graph_data.edges|tojson }});
+
+                    // Update node icons based on their type (PF or PJ)
+                    nodes.forEach(function (node) {
+                        if (node.id.startsWith("PF")) {
+                            node.image = "static/images/user.png";  // Set image for PF
+                            node.shape = "image";
+                        } else if (node.id.startsWith("PEP")) {
+                            node.image = "static/images/PEP.png";
+                            node.shape = "image";
+                        } else if (node.id.startsWith("BOL")) {
+                            node.image = "static/images/money_red.png";
+                            node.shape = "image";
+                        } else if (node.id.startsWith("AUX")) {
+                            node.image = "static/images/money_red.png";
+                            node.shape = "image";
+                        } else {
+                            node.image = "static/images/enterprise.png";  // Set image for PJ
+                            node.shape = "image";
+                        }
+                    });
+
+                    var container = document.getElementById('network');
+                    var data = {
+                        nodes: nodes,
+                        edges: edges
+                    };
+                    var options = {
+                        edges: {
+                            arrows: 'to',
+                            color: { color: '#6e6e6e' },
+                            font: { align: 'top', size: 10, color: '#000' }
+                        },
+                        interaction: { hover: true },
+                        nodes: { size: 10 }
+                    };
+
+                    var network = new vis.Network(container, data, options);
+                </script>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Initialize - set first step as active
+        document.getElementById('step1').classList.add('active');
+        
+        // When form is submitted
+        document.querySelector('form').addEventListener('submit', function() {
+            // Show loading state
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+            
+            // If you're using AJAX to load results:
+            // This would go in your AJAX success callback
+            function showResults() {
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('step3').classList.add('active');
+            }
+            
+            // For non-AJAX forms (page reload):
+            // We'll need to check URL parameters or use sessionStorage
+            if (window.location.search.includes('submitted=true')) {
+                showResults();
+            }
+        });
+        
+        // Check if we're returning to the page after submission
+        if (window.location.search.includes('submitted=true')) {
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('completed');
+        }
+    </script>
+
+    <script>
+        // ===== DATA PRESERVATION =====
+        // Save form data when user starts typing
+        const form = document.querySelector('form');
+        const formData = {};
+        
+        // Initialize form data from localStorage if available
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem('unsavedFormData_' + window.location.pathname);
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                Object.keys(data).forEach(key => {
+                    const element = form.querySelector(`[name="${key}"]`);
+                    if (element) {
+                        element.value = data[key];
+                        // For checkboxes
+                        if (element.type === 'checkbox') {
+                            element.checked = data[key];
+                        }
+                    }
+                });
+                
+                if (confirm('Encontramos dados não enviados de sua última sessão nesta página. Deseja restaurá-los?')) {
+                    Object.assign(formData, data);
+                } else {
+                    localStorage.removeItem('unsavedFormData_' + window.location.pathname);
+                }
+            }
+        });
+
+        // Save data on input
+        form.querySelectorAll('input, select, textarea').forEach(element => {
+            element.addEventListener('input', () => {
+                formData[element.name] = element.type === 'checkbox' ? element.checked : element.value;
+                localStorage.setItem('unsavedFormData_' + window.location.pathname, JSON.stringify(formData));
+            });
+        });
+
+        // Clear saved data on successful form submission
+        form.addEventListener('submit', () => {
+            localStorage.removeItem('unsavedFormData_' + window.location.pathname);
+        });
+        // ===== END DATA PRESERVATION =====
+    </script>
+</body>
+</html>

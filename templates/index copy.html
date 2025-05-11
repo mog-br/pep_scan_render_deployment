@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1300px; /* Aumentei um pouco o max-width para acomodar melhor os gráficos */
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            background-color: #002147;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav {
+            background-color: #004080;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .charts-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .chart {
+            width: 48%; /* Cada gráfico vai ocupar aproximadamente metade da largura da página */
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .chart img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        form label {
+            font-weight: bold;
+        }
+        form select {
+            margin: 10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        form button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .btn {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display:   
+ inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bem-vindo à PEP Scan!</h1>
+        <p>A Ferramenta de Auxílio à Identificação de Possíveis Atos de Lavagem de Dinheiro Entre PEPs no Brasil</p>
+    </header>
+    <nav>
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('peps_distribution') }}">Distribuição de PEPs</a>
+        <a href="{{ url_for('descriptive_analysis') }}">PEPs que Receberam Auxílio do Governo</a>
+        <a href="{{ url_for('shortest_path') }}">Caminho Mais Curto</a>
+        <a href="{{ url_for('user_input_analysis') }}">Análise de Grafos</a>
+        <a href="{{ url_for('contacts') }}">Contato</a>
+    </nav>
+    <div class="container">
+        <h2>Motivação do Estudo sobre PEPs</h2>
+        <p>O desenvolvimento da PEP Scan está inserida no contexto deste estudo da crescente preocupação com esquemas de fraude e desvios de dinheiro no Brasil, envolvendo pessoas politicamente expostas (PEPs). PEPs são indivíduos que ocupam posições públicas proeminentes ou possuem influência significativa sobre ações governamentais ou transações comerciais devido a suas conexões ou recursos financeiros. De acordo com a legislação brasileira, PEPs são sujeitas a rigoroso monitoramento por instituições como Bacen (Banco Central do Brasil), Coaf (Conselho de Controle de Atividades Financeiras) e Susep (Superintendência de Seguros Privados).</p>
+        
+        <p>O objetivo deste estudo é utilizar técnicas de mineração de dados e teoria dos grafos para analisar várias fontes de dados publicamente disponíveis sobre PEPs no Brasil e identificar possíveis esquemas de fraude e lavagem de dinheiro.</p>
+        
+        <p>A mineração de dados é definida como "o processo de extração de padrões ou modelos úteis a partir de dados" (Han et al., 2011). Envolve o uso de várias técnicas e algoritmos para descobrir insights ocultos em grandes conjuntos de dados, como regras de associação, classificação, agrupamento e detecção de anomalias. Aggarwal (2015) destaca a importância da mineração de dados em diversos domínios de aplicação, incluindo finanças, saúde, marketing e análise de mídias sociais.</p>
+        
+        <p>Além disso, o uso de técnicas de mineração de dados e teoria dos grafos na identificação de esquemas de fraude e recebimentos ilegais de dinheiro tem ganhado destaque nos últimos anos. Métodos baseados em grafos são eficazes na detecção de padrões ocultos de comportamento fraudulento que poderiam passar despercebidos por métodos estatísticos tradicionais. Este estudo propõe utilizar técnicas baseadas em grafos para identificar comportamentos fraudulentos no Brasil envolvendo PEPs.</p>
+        
+        <p>A identificação de PEPs e seu possível envolvimento em esquemas fraudulentos e de lavagem de dinheiro é crucial para mitigar os riscos associados a essas atividades ilícitas. O envolvimento de PEPs no crime financeiro representa um grande desafio para governos e instituições financeiras em todo o mundo. Monitorar PEPs é essencial para prevenir crimes financeiros e manter a integridade dos sistemas financeiros.</p>
+        
+        <p>A análise de dados por meio da teoria dos grafos tornou-se uma ferramenta popular na detecção de atividades fraudulentas. Este estudo visa identificar relações entre PEPs e outras entidades, como empresas e transações financeiras, para detectar possíveis esquemas fraudulentos e de lavagem de dinheiro.</p>
+        
+        <p>Por fim, a análise de fontes de dados públicas fornecerá insights valiosos sobre a distribuição e a natureza dos dados disponíveis sobre PEPs no Brasil. O estudo também se propõe a realizar uma análise descritiva das fontes de dados, identificar candidatos a cargos políticos considerados PEPs, empresas cujos proprietários são PEPs e foram registradas após o início de sua exposição pública, além de examinar a estrutura de capital dessas empresas e sua distribuição geográfica.</p>
+        
+        <p>Os resultados deste estudo serão disponibilizados em uma plataforma pública, permitindo que o governo acesse informações relacionadas às PEPs e seu possível envolvimento em tais atividades.</p>
+    </div>
+</body>
+</html>

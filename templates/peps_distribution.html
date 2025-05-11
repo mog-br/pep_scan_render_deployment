@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Distribuição de PEPs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1300px; /* Aumentei um pouco o max-width para acomodar melhor os gráficos */
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        header {
+            background-color: #002147;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav {
+            background-color: #004080;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a.active {
+        background-color: #002147;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid white;
+        }
+        .page-context {
+        margin-bottom: 30px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        }
+        .context-description {
+            color: #666;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .charts-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .chart {
+            width: 48%; /* Cada gráfico vai ocupar aproximadamente metade da largura da página */
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .chart img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        form label {
+            font-weight: bold;
+        }
+        form select {
+            margin: 10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        form button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .btn {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display:   
+ inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Distribuição de PEPs no Brasil</h1>
+    </header>
+
+    <nav>
+        <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('peps_distribution') }}" class="{% if request.endpoint == 'peps_distribution' %}active{% endif %}">Distribuição de PEPs</a>
+        <a href="{{ url_for('descriptive_analysis') }}" class="{% if request.endpoint == 'descriptive_analysis' %}active{% endif %}">Auxílios do Governo</a>
+        <a href="{{ url_for('shortest_path') }}" class="{% if request.endpoint == 'shortest_path' %}active{% endif %}">Caminho Mais Curto</a>
+        <a href="{{ url_for('user_input_analysis') }}" class="{% if request.endpoint == 'user_input_analysis' %}active{% endif %}">Relacionamentos</a>
+        <a href="{{ url_for('contacts') }}" class="{% if request.endpoint == 'contacts' %}active{% endif %}">Contato</a>
+    </nav>
+    
+    <div class="container">
+        <div class="page-context">
+            <h1>{{ self._TemplateReference__context.title }}</h1>
+            <p class="context-description">
+                {% if request.endpoint == 'home' %}
+                    Ferramenta de análise de PEPs brasileiros
+                {% elif request.endpoint == 'peps_distribution' %}
+                    Distribuição geográfica e por categoria de PEPs
+                {% elif request.endpoint == 'descriptive_analysis' %}
+                    Análise de beneficiários de auxílios governamentais
+                {% endif %}
+                <!-- Add descriptions for other pages as needed -->
+            </p>
+        </div>
+
+        <h2>O que são autoridades politicamente expostas (PEPs)?</h2>
+        <p>Pessoas que ocupam ou ocuparam cargos públicos importantes (como políticos, ministros, diretores de estatais) e seus familiares próximos. No Brasil, essas pessoas têm seu histórico financeiro monitorado para prevenir irregularidades.</p>
+        
+        <h2>Distribuição de PEPs Políticos</h2>
+        <p>PEPs políticos, são os que ocuparam cargos do governo e, portanto, possuem vínculos políticos. A seguir, mostramos a distribuição destes indivíduos:</p>
+
+        <div class="charts-container">
+            <div class="chart">
+                <h3>Distribuição de PEPs Políticos</h3>
+                <img src="{{ url_for('static', filename='images/pep_politicians_distribution.png') }}" alt="Distribuição de PEPs Políticos">
+            </div>
+            <div class="chart">
+                <h3>Distribuição de PEPs Políticos por Estado</h3>
+                <img src="{{ url_for('static', filename='images/pep_politicians_by_state.png') }}" alt="Distribuição de PEPs Políticos por Estado">
+            </div>
+        </div>
+
+        <h2>Distribuição de PEPs Não Políticos</h2>
+        <p>Além dos PEPs políticos, existem PEPs que ocupam ou ocuparam cargos de destaque em empresas estatais, autarquias, e outros órgãos públicos que não possuem vínculos políticos. A seguir, mostramos a distribuição destes indivíduos:</p>
+
+        <div class="charts-container">
+            <div class="chart">
+                <h3>Distribuição de PEPs Não Políticos</h3>
+                <img src="{{ url_for('static', filename='images/pep_non_politicians_distribution.png') }}" alt="Distribuição de PEPs Não Políticos">
+            </div>
+            <div class="chart">
+                <h3>Distribuição de PEPs Não Políticos por Estado</h3>
+                <img src="{{ url_for('static', filename='images/pep_not_politicians_by_state.png') }}" alt="Distribuição de PEPs Não Políticos por Estado">
+            </div>
+        </div>
+
+ 
+    </div>
+</body>
+</html>
